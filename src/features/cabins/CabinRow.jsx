@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { formatCurrency } from "../../utils/helpers";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCabin } from "../../services/apiCabins";
 
 const TableRow = styled.div`
   display: grid;
@@ -42,7 +44,26 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const { discount, regularPrice, maxCapacity, image, name } = cabin;
+  const {
+    discount,
+    regularPrice,
+    maxCapacity,
+    image,
+    name,
+    id: cabinId,
+  } = cabin;
+
+  const queryClient = useQueryClient();
+
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (id) => deleteCabin(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cabins"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
   return (
     <TableRow role="row">
       <Img src={image} alt={name} />
@@ -50,7 +71,9 @@ function CabinRow({ cabin }) {
       <div>Fits up to {maxCapacity} guests</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      <button>Delete</button>
+      <button onClick={() => mutate(cabinId)} disabled={isLoading}>
+        Delete
+      </button>
     </TableRow>
   );
 }
@@ -62,6 +85,7 @@ CabinRow.propTypes = {
     maxCapacity: PropTypes.number.isRequired,
     image: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
   }).isRequired,
 };
 
