@@ -85,7 +85,7 @@ CabinRow.propTypes = {
     discount: PropTypes.number.isRequired,
     regularPrice: PropTypes.number.isRequired,
     maxCapacity: PropTypes.number.isRequired,
-    image: PropTypes.string.isRequired,
+    image: PropTypes.string,
     name: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
   }).isRequired,
