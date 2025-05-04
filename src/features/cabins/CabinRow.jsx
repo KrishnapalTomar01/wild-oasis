@@ -5,6 +5,8 @@ import { useState } from "react";
 import { formatCurrency } from "../../utils/helpers";
 import CreateCabinForm from "./CreateCabinForm";
 import useDeleteCabin from "./useDeleteCabin";
+import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
+import useCreateCabin from "./useCreateCabin";
 
 const TableRow = styled.div`
   display: grid;
@@ -53,9 +55,22 @@ function CabinRow({ cabin }) {
     image,
     name,
     id: cabinId,
+    description,
   } = cabin;
   const [showForm, setShowForm] = useState(false);
   const { isDeleting, deleteCabinMutate } = useDeleteCabin();
+  const { isCreating, createCabin } = useCreateCabin();
+
+  function handleDuplicate() {
+    createCabin({
+      name: `Copy of ${name}`,
+      discount,
+      regularPrice,
+      maxCapacity,
+      image,
+      description,
+    });
+  }
 
   return (
     <>
@@ -70,12 +85,17 @@ function CabinRow({ cabin }) {
           <span>&mdash;</span>
         )}
         <div>
-          <button onClick={() => setShowForm((show) => !show)}>Edit</button>
+          <button onClick={handleDuplicate} disabled={isCreating}>
+            <HiSquare2Stack />
+          </button>
+          <button onClick={() => setShowForm((show) => !show)}>
+            <HiPencil />
+          </button>
           <button
             onClick={() => deleteCabinMutate(cabinId)}
             disabled={isDeleting}
           >
-            Delete
+            <HiTrash />
           </button>
         </div>
       </TableRow>
@@ -93,6 +113,7 @@ CabinRow.propTypes = {
     image: PropTypes.string,
     name: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
+    description: PropTypes.string,
   }).isRequired,
 };
 
